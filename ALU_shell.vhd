@@ -40,27 +40,6 @@ end ALU;
 
 architecture ALU of ALU is	   
 
-COMPONENT Lab1_8bit is
-	Port( A : in  STD_LOGIC;
-         B : in  STD_LOGIC;
-         C : in  STD_LOGIC;
-         D : in  STD_LOGIC;
-         A_O : out  STD_LOGIC;
-         B_O : out  STD_LOGIC;
-         C_O : out  STD_LOGIC;
-         D_O : out  STD_LOGIC);
-END COMPONENT;
-
-COMPONENT Fourbit_adder is
-	PORT( Ain : in  STD_LOGIC_VECTOR (3 downto 0);
-         Bin : in  STD_LOGIC_VECTOR (3 downto 0);
-			Sub : in STD_LOGIC;
-         Sum : out  STD_LOGIC_VECTOR (3 downto 0);
-			Over : out STD_LOGIC);
-END COMPONENT;
-
-Signal Add, Neg : Std_logic_vector (3 downto 0);
-signal extra : std_logic;
 
 begin
 	
@@ -78,22 +57,7 @@ begin
 --  6     : ADD
 --  7     : LD
 
-adder: Fourbit_adder PORT MAP(
-	Ain => Data,
-	Bin => Accumulator,
-	Sub => '0',
-	Sum => Add,
-	Over => extra);
-	
-negator: Lab1_8bit PORT MAP(
-	A => Accumulator(3),
-	B => Accumulator(2),
-	C => Accumulator(1),
-	D => Accumulator(0),
-	A_O => Neg(3),
-	B_O => Neg(2),
-	C_O => Neg(1),
-	D_O => Neg(0));
+
 
 aluswitch: process (Accumulator, Data, OpSel)
         begin
@@ -104,7 +68,7 @@ aluswitch: process (Accumulator, Data, OpSel)
 			result <= Data and Accumulator;
 		  
 			elsif OpSel="001" then
-			result <= Neg;
+			result <= (not Accumulator) + '1';
 		  
 			elsif Opsel="010" then
 			result <= not Accumulator;
@@ -120,7 +84,7 @@ aluswitch: process (Accumulator, Data, OpSel)
 			result <= Data;
 			
 			elsif OpSel="110" then
-			result <= Add;
+			result <= Data + Accumulator;
 			
 			elsif Opsel="111" then
 			result <= Data;
